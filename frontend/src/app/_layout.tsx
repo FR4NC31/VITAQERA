@@ -6,7 +6,7 @@ import { useEffect } from "react";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     "Fraunces-SemiBold": require("@/assets/fonts/fraunces/Fraunces_72pt-SemiBold.ttf"),
     "Fraunces-Bold": require("@/assets/fonts/fraunces/Fraunces_72pt-Bold.ttf"),
 
@@ -17,13 +17,17 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     return null;
+  }
+
+  if(fontError) {
+    throw fontError
   }
 
   return <Stack screenOptions={{ headerShown: false }} />;

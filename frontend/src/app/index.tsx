@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import { colors, fontSize } from "@/theme/theme";
+import { colors, fontSize, spacing } from "@/theme/theme";
 
 export default function Index() {
   return (
@@ -15,16 +15,20 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.screenHorizontal,
   },
 
   heading: {
     fontFamily: "Fraunces-Bold",
-    fontSize: 30,
+    fontSize: fontSize["4xl"],
+    color: colors.textPrimary,
   },
 
   body: {
-    fontFamily: "Manrope-Bold",
-    fontSize: fontSize["4xl"],
+    marginTop: spacing[2],
+    fontFamily: "Manrope-Regular",
+    fontSize: fontSize.lg,
+    color: colors.textSecondary,
   },
 });
