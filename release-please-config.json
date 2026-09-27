@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "bf87930268cbedfdcea68c7a286851c4a4061974",
+  "include-v-in-tag": true,
+  "include-component-in-tag": false,
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "VitaQera",
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        {
+            "type": "json",
+            "path": "frontend/app.json",
+            "jsonpath": "$.expo.version"
+        },
+        {
+            "type": "json",
+            "path": "frontend/package.json",
+            "jsonpath": "$.version"
+        },
+        {
+            "type": "json",
+            "path": "frontend/package-lock.json",
+            "jsonpath": "$.version"
+        },
+        {
+            "type": "json",
+            "path": "frontend/package-lock.json",
+            "jsonpath": "$.packages[''].version"
+        }
+        ]
+    }
+  }
+}
