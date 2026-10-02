@@ -28,28 +28,28 @@ jobs:
             echo
 
             echo "### Features"
-            git log main..develop --no-merges \
+            git log origin/main..HEAD --no-merges \
               --pretty=format:"- %s (%h)" \
               --grep="^feat" || true
 
             echo
             echo
             echo "### Bug Fixes"
-            git log main..develop --no-merges \
+            git log origin/main..HEAD --no-merges \
               --pretty=format:"- %s (%h)" \
               --grep="^fix" || true
 
             echo
             echo
             echo "### Chores"
-            git log main..develop --no-merges \
+            git log origin/main..HEAD --no-merges \
               --pretty=format:"- %s (%h)" \
               --grep="^chore" || true
 
             echo
             echo
             echo "### Other Changes"
-            git log main..develop --no-merges \
+            git log origin/main..HEAD --no-merges \
               --pretty=format:"- %s (%h)" \
               --invert-grep \
               --grep="^feat" \
@@ -72,4 +72,4 @@ jobs:
 
           git add CHANGELOG.dev.md
           git commit -m "chore: update development changelog"
-          git push
+          git push origin HEAD:develop
