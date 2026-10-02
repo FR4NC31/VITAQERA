@@ -1,0 +1,75 @@
+name: Develop Changelog
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate development changelog
+        shell: bash
+        run: |
+          {
+            echo "# Development Changelog"
+            echo
+            echo "## Unreleased"
+            echo
+
+            echo "### Features"
+            git log main..develop --no-merges \
+              --pretty=format:"- %s (%h)" \
+              --grep="^feat" || true
+
+            echo
+            echo
+            echo "### Bug Fixes"
+            git log main..develop --no-merges \
+              --pretty=format:"- %s (%h)" \
+              --grep="^fix" || true
+
+            echo
+            echo
+            echo "### Chores"
+            git log main..develop --no-merges \
+              --pretty=format:"- %s (%h)" \
+              --grep="^chore" || true
+
+            echo
+            echo
+            echo "### Other Changes"
+            git log main..develop --no-merges \
+              --pretty=format:"- %s (%h)" \
+              --invert-grep \
+              --grep="^feat" \
+              --grep="^fix" \
+              --grep="^chore" || true
+
+            echo
+          } > CHANGELOG.dev.md
+
+      - name: Commit development changelog
+        shell: bash
+        run: |
+          if git diff --quiet CHANGELOG.dev.md; then
+            echo "No changelog changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add CHANGELOG.dev.md
+          git commit -m "chore: update development changelog"
+          git push
