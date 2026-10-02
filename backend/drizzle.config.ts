@@ -1,7 +1,7 @@
 import { defineConfig } from "drizzle-kit";
 
 if (!process.env.NEONDB_URL) {
-  throw new Error("DATABASE_URL is required");
+  throw new Error("NEONDB_URL is required");
 }
 
 export default defineConfig({

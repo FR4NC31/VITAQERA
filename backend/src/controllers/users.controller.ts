@@ -18,30 +18,41 @@ function createUsersService(c: Context<{Bindings: Bindings}>) {
 export async function getCurrentUserController(
   c: Context<{ Bindings: Bindings }>,
 ) {
-  const auth = getAuth(c);
+  try {
+    const auth = getAuth(c);
 
-  if (!auth?.userId) {
+    if (!auth?.userId) {
+      return c.json(
+        errorResponse("Unauthorized", "UNAUTHORIZED"),
+        401,
+      );
+    }
+
+    const service = createUsersService(c);
+
+    const user = await service.getByClerkUserId(auth.userId);
+
+    if (!user) {
+      return c.json(
+        errorResponse("User not found", "USER_NOT_FOUND"),
+        404,
+      );
+    }
+
     return c.json(
-      errorResponse("Unauthorized", "UNAUTHORIZED"),
-      401,
+      successResponse(user, "User fetched successfully"),
+    );
+  } catch (error) {
+    console.error("Failed to fetch current user:", error);
+
+    return c.json(
+      errorResponse(
+        "Unable to fetch user",
+        "USER_FETCH_FAILED",
+      ),
+      500,
     );
   }
-
-  const service = createUsersService(c)
-
-  const user = await service.getByClerkUserId(auth.userId);
-
-  if (!user) {
-    return c.json(
-      errorResponse("User not found", "USER_NOT_FOUND"),
-      404,
-    );
-  }
-
-  return c.json(
-    successResponse(user, "User fetched successfully"),
-  );
-  
 }
 
 export const syncCurrentUserController = async (
