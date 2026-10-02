@@ -2,8 +2,8 @@ import { getAuth } from "@clerk/hono";
 import { createClerkClient } from '@clerk/backend'
 import type { Context } from "hono";
 
-import { createDB } from "../db/clients";
-import { UsersRepository } from "../repositories/users.respository";
+import { createDB } from "../db/client";
+import { UsersRepository } from "../repositories/users.repository";
 import { UsersService } from "../services/users.service";
 import type { Bindings } from "../types/bindings";
 import { errorResponse, successResponse } from "../utils/response";
@@ -44,46 +44,59 @@ export async function getCurrentUserController(
   
 }
 
-export async function syncCurrentUserController(c: Context<{Bindings: Bindings}>) {
+export const syncCurrentUserController = async (
+  c: Context<{ Bindings: Bindings }>,
+) => {
+  try {
     const auth = getAuth(c);
 
-    if(!auth?.userId) {
+    if (!auth?.userId) {
       return c.json(
         errorResponse("Unauthorized", "UNAUTHORIZED"),
-      )
+        401,
+      );
     }
 
-    const clerk = createClerkClient ({
-      secretKey: c.env.CLERK_SECRET_KEY
-    })
+    const clerk = createClerkClient({
+      secretKey: c.env.CLERK_SECRET_KEY,
+    });
 
-    const clerkUser = await clerk.users.getUser(auth.userId)
+    const clerkUser = await clerk.users.getUser(auth.userId);
 
-    const primaryEmail = clerkUser.emailAddresses.find(
-      (email) => email.id === clerkUser.primaryEmailAddressId,
-    )?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress
+    const primaryEmail =
+      clerkUser.emailAddresses.find(
+        (email) => email.id === clerkUser.primaryEmailAddressId,
+      )?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress;
 
-    if(!primaryEmail) {
+    if (!primaryEmail) {
       return c.json(
         errorResponse(
           "Authenticated user has no email address",
           "EMAIL_NOT_FOUND",
         ),
-        422
-      )
+        422,
+      );
     }
 
-    const service = createUsersService(c)
+    const service = createUsersService(c);
 
     const user = await service.syncUser({
       clerkUserId: auth.userId,
       email: primaryEmail,
       firstName: clerkUser.firstName,
-      lastName: clerkUser.lastName
-    })
+      lastName: clerkUser.lastName,
+    });
 
     return c.json(
       successResponse(user, "User synced successfully"),
-    )
-}
+    );
+  } catch (error) {
+    console.error("Failed to sync current user:", error);
+
+    return c.json(
+      errorResponse("Unable to sync user", "USER_SYNC_FAILED"),
+      500,
+    );
+  }
+};
 

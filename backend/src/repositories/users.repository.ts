@@ -1,5 +1,5 @@
 import {eq} from 'drizzle-orm'
-import type { createDB} from '../db/clients'
+import type { createDB} from '../db/client'
 import { users } from '../db/schema/users'
 
 type DB = ReturnType<typeof createDB>
@@ -45,7 +45,7 @@ export class UsersRepository {
     const result = await this.db
     .update(users)
     .set({
-        email: users.email,
+        email: input.email,
         firstName: input.firstName ?? null,
         lastName: input.lastName ?? null,
         updatedAt: new Date()

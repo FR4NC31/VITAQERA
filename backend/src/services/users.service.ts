@@ -1,4 +1,4 @@
-import type { CreateUserInput, UsersRepository } from '../repositories/users.respository.ts'
+import type { CreateUserInput, UsersRepository } from '../repositories/users.repository.ts'
 
 export class UsersService {
     constructor(private readonly usersRepository: UsersRepository) {}

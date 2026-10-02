@@ -5,6 +5,7 @@
     "": {
       "name": "backend",
       "dependencies": {
+        "@clerk/backend": "^3.22.0",
         "@clerk/hono": "^0.1.85",
         "@neondatabase/serverless": "^1.2.0",
         "drizzle-orm": "^0.45.3",

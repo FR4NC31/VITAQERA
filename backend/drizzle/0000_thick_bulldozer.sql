@@ -1,11 +1,11 @@
 CREATE TABLE "users" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-  "clerk_user_id" text NOT NULL,
+  "clerk-user-id" text NOT NULL,
   "email" text NOT NULL,
-  "first_name" text,
-  "last_name" text,
-  "created_at" timestamp with time zone DEFAULT now() NOT NULL,
-  "updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-  CONSTRAINT "users_clerk_user_id_unique" UNIQUE("clerk_user_id"),
+  "first-name" text,
+  "last-name" text,
+  "created-at" timestamp with time zone,
+  "updated-at" timestamp with time zone DEFAULT now() NOT NULL,
+  CONSTRAINT "users_clerk-user-id_unique" UNIQUE("clerk-user-id"),
   CONSTRAINT "users_email_unique" UNIQUE("email")
 );

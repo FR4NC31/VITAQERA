@@ -1,12 +1,9 @@
 import { Hono } from "hono";
-import { clerkMiddleware, getAuth } from '@clerk/hono'
 import { healthRoute } from "./routes/health.route.ts";
 import type { Bindings } from "./types/bindings.ts"
-import { userRoute } from "./routes/users.routes.ts";
+import { userRoute } from "./routes/users.route.ts";
 
 const app = new Hono<{Bindings: Bindings}>();
-
-app.use("*", clerkMiddleware())
 
 app.get("/", (c) => {
   return c.json({

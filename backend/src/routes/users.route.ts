@@ -9,4 +9,4 @@ userRoute.use("*", authMiddleware)
 userRoute.use("*", requireAuth)
 
 userRoute.get("/me", getCurrentUserController)
-userRoute.get("/me/sync", syncCurrentUserController)
+userRoute.post("/me/sync", syncCurrentUserController)

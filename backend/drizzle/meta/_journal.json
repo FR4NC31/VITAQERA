@@ -15,6 +15,13 @@
       "when": 1790957380859,
       "tag": "0001_modern_lightspeed",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790958934692,
+      "tag": "0002_fix_created_at",
+      "breakpoints": true
     }
   ]
 }
