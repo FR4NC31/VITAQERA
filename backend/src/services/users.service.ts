@@ -8,16 +8,6 @@ export class UsersService {
     }
 
     async syncUser(input: CreateUserInput) {
-        const existingUser = await this.usersRepository.findByClerkUserId(input.clerkUserId)
-
-        if(!existingUser) {
-            return this.usersRepository.create(input)
-        }
-
-        return this.usersRepository.updateProfile(input.clerkUserId, {
-            email: input.email,
-            firstName: input.firstName,
-            lastName: input.lastName
-        })
+        return this.usersRepository.upsert(input);
     }
 }
