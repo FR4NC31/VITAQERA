@@ -35,6 +35,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "postinstall": "node ./scripts/patch-expo-typed-routes.cjs",
     "start": "expo start --android",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",

@@ -204,7 +204,7 @@ export function AuthScreen({
                 accessibilityRole="button"
                 accessibilityLabel="Go back"
                 style={styles.backButton}
-                onPress={() => router.canGoBack() ? router.back() : router.replace('/getStarted')}
+                onPress={() => router.canGoBack() ? router.back() : router.replace('/get-started')}
               >
                 <Feather name="chevron-left" size={27} color="#142C30" />
               </TouchableOpacity>

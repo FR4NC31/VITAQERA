@@ -124,7 +124,7 @@ export default function LoginMethod({
               if (onContinue) {
                 onContinue('email');
               } else {
-                router.push('/auth/auth');
+                router.push('/auth');
               }
             }}
             accessibilityRole="button"

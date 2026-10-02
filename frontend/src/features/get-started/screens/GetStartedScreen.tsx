@@ -28,7 +28,7 @@ export function GetStartedScreen() {
     ? Math.min(width * 0.93, height * 0.46, 446)
     : Math.min(width * 1.02, height * 0.47, 460);
   const slide = slides[activeIndex];
-  const openAuth = () => router.replace("/auth/auth");
+  const openAuth = () => router.replace("/auth");
   const selectSlide = (index: number) => {
     setActiveIndex(index);
     scrollRef.current?.scrollTo({ y: 0, animated: false });

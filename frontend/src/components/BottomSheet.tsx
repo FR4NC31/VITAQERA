@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: 'center',
     paddingTop: spacing[3],
-    touchAction: 'none',
   },
 
   handle: {
