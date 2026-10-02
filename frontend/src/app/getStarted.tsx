@@ -1,0 +1,1 @@
+export { GetStartedScreen as default } from "@/features/get-started/screens/GetStartedScreen";

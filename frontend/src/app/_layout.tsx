@@ -30,5 +30,13 @@ export default function RootLayout() {
     throw fontError
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        statusBarStyle: "dark",
+        statusBarHidden: false,
+      }}
+    />
+  );
 }
