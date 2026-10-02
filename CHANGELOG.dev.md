@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Features
+- feat: add backend with auth and user persistence foundation (fce90ae)
 - feat: Get Started and Auth UI implemented (5996717)
 - feat: add app themes abd local fonts (b6bdec6)
 
@@ -13,6 +14,7 @@
 - fix: address project foundation review findings (f6a5300)
 
 ### Chores
+- chore: update development changelog (661e4e7)
 - chore: add development changelog with example (47f3d8c)
 - chore: add development changelog (b8a3b92)
 - chore: add develop changelog workflow (bc725cd)
