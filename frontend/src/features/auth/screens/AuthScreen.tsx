@@ -48,6 +48,7 @@ type AuthScreenProps = {
   onSignIn?: (values: AuthFormValues) => void | Promise<void>;
   onSignUp?: (values: AuthFormValues) => void | Promise<void>;
   onForgotPassword?: (email: string) => void;
+  successMessage?: string | null;
   onTermsPress?: () => void;
   onPrivacyPress?: () => void;
 };
@@ -56,6 +57,7 @@ export function AuthScreen({
   onSignIn,
   onSignUp,
   onForgotPassword,
+  successMessage,
   onTermsPress,
   onPrivacyPress,
 }: AuthScreenProps = {}) {
@@ -66,6 +68,7 @@ export function AuthScreen({
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [switching, setSwitching] = useState(false);
   const [tabWidth, setTabWidth] = useState(0);
   const tabProgress = useSharedValue(0);
@@ -128,6 +131,12 @@ export function AuthScreen({
     setSubmitError('');
   };
 
+  const forgotPassword = () => {
+    if (!onForgotPassword || submitting || submittingRef.current || switching) return;
+    Keyboard.dismiss();
+    onForgotPassword(form.email.trim());
+  };
+
   const selectMode = (nextMode: AuthMode) => {
     if (submitting || switching || pendingTransition.current || mode === nextMode) return;
     Keyboard.dismiss();
@@ -152,7 +161,7 @@ export function AuthScreen({
   };
 
   const submit = async () => {
-    if (submitting || switching) return;
+    if (submitting || submittingRef.current || switching) return;
     const nextErrors: FormErrors = {};
     if (isSignUp && !form.name.trim()) nextErrors.name = 'Please enter your name.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
@@ -175,12 +184,14 @@ export function AuthScreen({
     Keyboard.dismiss();
     const onSubmit = isSignUp ? onSignUp : onSignIn;
     if (!onSubmit) return;
+    submittingRef.current = true;
     setSubmitting(true);
     try {
       await onSubmit({ name: form.name.trim(), email: form.email.trim(), password: form.password });
-    } catch {
-      setSubmitError(isSignUp ? 'Unable to create your account. Please try again.' : 'Unable to sign in. Please try again.');
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : isSignUp ? 'Unable to create your account. Please try again.' : 'Unable to sign in. Please try again.');
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -332,7 +343,7 @@ export function AuthScreen({
                         accessibilityRole="button"
                         hitSlop={12}
                         disabled={submitting}
-                        onPress={() => onForgotPassword?.(form.email.trim())}
+                        onPress={forgotPassword}
                       >
                         <Text style={styles.forgotPassword}>Forgot password?</Text>
                       </TouchableOpacity>
@@ -359,6 +370,7 @@ export function AuthScreen({
                 </View>
 
                 {submitError && <Text accessibilityLiveRegion="polite" style={styles.submitError}>{submitError}</Text>}
+                {!isSignUp && successMessage && <Text accessibilityLiveRegion="polite" style={styles.successMessage}>{successMessage}</Text>}
                 <TouchableOpacity
                   activeOpacity={0.75}
                   accessibilityRole="button"
@@ -416,7 +428,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingBottom: 40,
   },
 
   screen: {
@@ -424,6 +436,7 @@ const styles = StyleSheet.create({
     maxWidth: 480,
     alignSelf: 'center',
     paddingHorizontal: 20,
+    flexGrow: 1,
   },
 
   header: {
@@ -590,6 +603,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     color: '#B84242',
+  },
+
+  successMessage: {
+    marginTop: 12,
+    fontFamily: 'Manrope-Regular',
+    fontSize: 13,
+    lineHeight: 20,
+    color: colors.primary,
   },
 
   consent: {
