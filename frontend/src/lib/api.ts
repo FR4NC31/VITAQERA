@@ -13,14 +13,14 @@ export async function apiFetch<T>(
     options: ApiRequestOptions = {},
 ): Promise<T> {
     const {token, headers, ...requestOptions} = options
+    const requestHeaders = new Headers(headers)
+    if (!requestHeaders.has("Accept")) requestHeaders.set("Accept", "application/json")
+    if (!requestHeaders.has("Content-Type")) requestHeaders.set("Content-Type", "application/json")
+    if (token) requestHeaders.set("Authorization", `Bearer ${token}`)
 
     const response = await fetch(`${API_URL}${path}`, {
         ...requestOptions,
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}`, }: {}),
-        },
+        headers: requestHeaders,
     })
 
     if(!response.ok) {
