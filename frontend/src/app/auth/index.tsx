@@ -1,1 +1,1 @@
-export { AuthScreen as default } from "@/features/auth/screens/AuthScreen";
+export { AuthContainer as default } from "@/features/auth/containers/AuthContainer";
