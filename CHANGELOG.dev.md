@@ -9,6 +9,8 @@
 - feat: add app themes abd local fonts (b6bdec6)
 
 ### Bug Fixes
+- fix: retry email user sync and remove dotenv import (84ec21b)
+- fix: sync social users before onboarding (47a9791)
 - fix: clean up Clerk auth flow (6c58d24)
 - fix: make develop changelog workflow robust (f79ad58)
 - fix: address auth UI review issues (edada4a)
@@ -16,6 +18,7 @@
 - fix: address project foundation review findings (f6a5300)
 
 ### Chores
+- chore: update development changelog (158aba8)
 - chore: update development changelog (0f5b804)
 - chore: update development changelog (661e4e7)
 - chore: add development changelog with example (47f3d8c)
@@ -26,4 +29,4 @@
 - chore: add github actions ci (b447743)
 
 ### Other Changes
-
+- Add google and facebook auth (d5d8ed0)
