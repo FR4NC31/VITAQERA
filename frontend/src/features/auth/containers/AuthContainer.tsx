@@ -19,6 +19,7 @@ export function AuthContainer() {
   const { isLoaded, isSignedIn, getToken } = useAuth();
   const router = useRouter();
   const [awaitingSession, setAwaitingSession] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const syncStartedRef = useRef(false)
 
@@ -42,6 +43,7 @@ export function AuthContainer() {
       } catch (error) {
         syncStartedRef.current = false
         setAwaitingSession(false)
+        setSyncError("We couldn't finish setting up your account. Please try again.")
 
         if(__DEV__) {
           console.warn("[Auth] User sync failed: ", error)
@@ -191,8 +193,9 @@ export function AuthContainer() {
 
   const handleSignIn = async (values: AuthFormValues) => {
     if (!isLoaded) throw new Error("Authentication is still loading. Please try again.");
+    setSyncError(null);
     if (isSignedIn) {
-      router.replace("/onboarding");
+      setAwaitingSession(true);
       return;
     }
     let result;
@@ -223,8 +226,9 @@ export function AuthContainer() {
 
   const handleSignUp = async (values: AuthFormValues) => {
     if (!isLoaded) throw new Error("Authentication is still loading. Please try again.");
+    setSyncError(null);
     if (isSignedIn) {
-      router.replace("/onboarding");
+      setAwaitingSession(true);
       return;
     }
     let result;
@@ -307,5 +311,5 @@ export function AuthContainer() {
     );
   }
 
-  return <AuthScreen onSignIn={handleSignIn} onSignUp={handleSignUp} onForgotPassword={handleForgotPassword} successMessage={successMessage} />;
+  return <AuthScreen onSignIn={handleSignIn} onSignUp={handleSignUp} onForgotPassword={handleForgotPassword} successMessage={successMessage} syncError={syncError} />;
 }
