@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/expo";
 import { ActivityIndicator, View } from "react-native";
 
 export default function SSOCallback() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded } = useAuth();
 
   if (!isLoaded) {
     return (
@@ -17,10 +17,6 @@ export default function SSOCallback() {
         <ActivityIndicator />
       </View>
     );
-  }
-
-  if (isSignedIn) {
-    return <Redirect href="/onboarding" />;
   }
 
   return <Redirect href="/get-started" />;

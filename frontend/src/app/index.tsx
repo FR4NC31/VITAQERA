@@ -2,9 +2,9 @@ import { useAuth } from '@clerk/expo'
 import { Redirect } from 'expo-router'
 
 export default function Index() {
-  const { isLoaded, isSignedIn } = useAuth()
+  const { isLoaded } = useAuth()
 
   if (!isLoaded) return null
 
-  return <Redirect href={isSignedIn ? '/onboarding' : '/get-started'} />
+  return <Redirect href="/get-started" />
 }

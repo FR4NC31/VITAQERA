@@ -29,7 +29,7 @@ export async function syncCurrentUser(token: string) {
 
 export async function getCurrentUser(token: string) {
   const response = await apiFetch<ApiResponse<CurrentUser>>(
-    "api/users/me",
+    "/api/users/me",
     {
       method: "GET",
       token

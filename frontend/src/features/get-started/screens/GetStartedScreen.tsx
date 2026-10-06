@@ -26,6 +26,7 @@ export function GetStartedScreen() {
   const { isLoaded, isSignedIn, getToken } = useAuth();
   const [loadingProvider, setLoadingProvider] = useState<"google" | "facebook" | null>(null);
   const [awaitingSession, setAwaitingSession] = useState(false);
+  const [syncFailed, setSyncFailed] = useState(false);
   const signInBusy = useRef(false);
   const syncStartedRef = useRef(false);
   const router = useRouter();
@@ -40,33 +41,31 @@ export function GetStartedScreen() {
   const slide = slides[activeIndex];
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
+    if (!isLoaded || !isSignedIn || syncFailed || syncStartedRef.current) return;
 
-    if (!awaitingSession) {
-      router.replace("/onboarding");
-      return;
-    }
-
-    if (syncStartedRef.current) return;
     syncStartedRef.current = true;
-
-    setIsModalVisible(false);
-    signInBusy.current = false;
-    setLoadingProvider(null);
-    router.replace("/onboarding");
 
     const syncUser = async () => {
       try {
         const token = await getToken();
         if (!token) throw new Error("Unable to get authentication token.");
         await syncCurrentUser(token);
+        setIsModalVisible(false);
+        router.replace("/onboarding");
       } catch (error) {
+        syncStartedRef.current = false;
+        setSyncFailed(true);
+        setAwaitingSession(false);
+        Alert.alert("Sign-in incomplete", "We couldn't finish setting up your account. Please try again.");
         if (__DEV__) console.warn("[Auth] Social user sync failed:", error);
+      } finally {
+        signInBusy.current = false;
+        setLoadingProvider(null);
       }
     };
 
     void syncUser();
-  }, [awaitingSession, isLoaded, isSignedIn, getToken, router]);
+  }, [awaitingSession, isLoaded, isSignedIn, syncFailed, getToken, router]);
 
   const openAuth = () => router.replace("/auth");
   const selectSlide = (index: number) => {
@@ -90,6 +89,8 @@ export function GetStartedScreen() {
     setLoadingProvider(provider);
 
     if (isSignedIn) {
+      syncStartedRef.current = false;
+      setSyncFailed(false);
       setAwaitingSession(true);
       return;
     }
