@@ -6,6 +6,7 @@ import { AuthScreen, type AuthFormValues } from "../screens/AuthScreen";
 import { ForgotPasswordEmailScreen } from "../screens/ForgotPasswordEmailScreen";
 import { ForgotPasswordOtpScreen } from "../screens/ForgotPasswordOtpScreen";
 import { ResetPasswordScreen } from "../screens/ResetPasswordScreen";
+import { syncCurrentUser } from "@/services/userApi";
 
 type AuthFlow = "auth" | "forgot-email" | "forgot-otp" | "forgot-new-password";
 type ClerkResultError = { code?: string; message?: string; errors?: { code?: string }[] };
@@ -15,15 +16,49 @@ const clerkErrorCode = (error: ClerkResultError) => error.errors?.[0]?.code ?? e
 export function AuthContainer() {
   const { signIn } = useSignIn();
   const { signUp } = useSignUp();
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn, getToken } = useAuth();
   const router = useRouter();
   const [awaitingSession, setAwaitingSession] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
+
+  const syncStartedRef = useRef(false)
 
   useEffect(() => {
-    if (isLoaded && isSignedIn && awaitingSession) {
-      router.replace("/onboarding");
+    if(!isLoaded || !isSignedIn || !awaitingSession) return
+    if(syncStartedRef.current) return
+
+    syncStartedRef.current = true
+
+    const syncUser = async () => {
+      try {
+        const token = await getToken()
+
+        if(!token) {
+          throw new Error("Unable to get authentication token.")
+        }
+
+        await syncCurrentUser(token)
+
+        router.replace('/onboarding')
+      } catch (error) {
+        syncStartedRef.current = false
+        setAwaitingSession(false)
+        setSyncError("We couldn't finish setting up your account. Please try again.")
+
+        if(__DEV__) {
+          console.warn("[Auth] User sync failed: ", error)
+        }
+      }
     }
-  }, [isLoaded, isSignedIn, awaitingSession, router]);
+
+    void syncUser()
+  }, [
+    isLoaded,
+    isSignedIn,
+    awaitingSession,
+    getToken,
+    router
+  ])
 
   const [flow, setFlow] = useState<AuthFlow>("auth");
   const [resetEmail, setResetEmail] = useState("");
@@ -158,8 +193,9 @@ export function AuthContainer() {
 
   const handleSignIn = async (values: AuthFormValues) => {
     if (!isLoaded) throw new Error("Authentication is still loading. Please try again.");
+    setSyncError(null);
     if (isSignedIn) {
-      router.replace("/onboarding");
+      setAwaitingSession(true);
       return;
     }
     let result;
@@ -190,8 +226,9 @@ export function AuthContainer() {
 
   const handleSignUp = async (values: AuthFormValues) => {
     if (!isLoaded) throw new Error("Authentication is still loading. Please try again.");
+    setSyncError(null);
     if (isSignedIn) {
-      router.replace("/onboarding");
+      setAwaitingSession(true);
       return;
     }
     let result;
@@ -274,5 +311,5 @@ export function AuthContainer() {
     );
   }
 
-  return <AuthScreen onSignIn={handleSignIn} onSignUp={handleSignUp} onForgotPassword={handleForgotPassword} successMessage={successMessage} />;
+  return <AuthScreen onSignIn={handleSignIn} onSignUp={handleSignUp} onForgotPassword={handleForgotPassword} successMessage={successMessage} syncError={syncError} />;
 }

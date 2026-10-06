@@ -1,9 +1,12 @@
+import { useAuth, useSSO } from "@clerk/expo";
+import { useSignInWithGoogle } from "@clerk/expo/google";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import LoginMethod from "@/components/bottomSheets/LoginMethod";
+import LoginMethod, { type LoginProvider } from "@/components/bottomSheets/LoginMethod";
+import { syncCurrentUser } from "@/services/userApi";
 import { colors, spacing } from "@/theme/theme";
 import { HabitsHero } from "../components/HabitsHero";
 import { NutritionHero } from "../components/NutritionHero";
@@ -18,6 +21,14 @@ const slides = [
 ];
 
 export function GetStartedScreen() {
+  const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
+  const { startSSOFlow } = useSSO();
+  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const [loadingProvider, setLoadingProvider] = useState<"google" | "facebook" | null>(null);
+  const [awaitingSession, setAwaitingSession] = useState(false);
+  const [syncFailed, setSyncFailed] = useState(false);
+  const signInBusy = useRef(false);
+  const syncStartedRef = useRef(false);
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -28,14 +39,90 @@ export function GetStartedScreen() {
     ? Math.min(width * 0.93, height * 0.46, 446)
     : Math.min(width * 1.02, height * 0.47, 460);
   const slide = slides[activeIndex];
+
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || syncFailed || syncStartedRef.current) return;
+
+    syncStartedRef.current = true;
+
+    const syncUser = async () => {
+      try {
+        const token = await getToken();
+        if (!token) throw new Error("Unable to get authentication token.");
+        await syncCurrentUser(token);
+        setIsModalVisible(false);
+        router.replace("/onboarding");
+      } catch (error) {
+        syncStartedRef.current = false;
+        setSyncFailed(true);
+        setAwaitingSession(false);
+        Alert.alert("Sign-in incomplete", "We couldn't finish setting up your account. Please try again.");
+        if (__DEV__) console.warn("[Auth] Social user sync failed:", error);
+      } finally {
+        signInBusy.current = false;
+        setLoadingProvider(null);
+      }
+    };
+
+    void syncUser();
+  }, [awaitingSession, isLoaded, isSignedIn, syncFailed, getToken, router]);
+
   const openAuth = () => router.replace("/auth");
   const selectSlide = (index: number) => {
     setActiveIndex(index);
-    scrollRef.current?.scrollTo({ y: 0, animated: false });
   };
   const next = () => {
     if (isLastSlide) setIsModalVisible(true);
     else selectSlide(activeIndex + 1);
+  };
+
+  const handleContinue = async (provider: LoginProvider) => {
+    if (provider === "email") {
+      setIsModalVisible(false);
+      router.push("/auth");
+      return;
+    }
+
+    if (signInBusy.current || !isLoaded) return;
+
+    signInBusy.current = true;
+    setLoadingProvider(provider);
+
+    if (isSignedIn) {
+      syncStartedRef.current = false;
+      setSyncFailed(false);
+      setAwaitingSession(true);
+      return;
+    }
+
+    let sessionActivated = false;
+
+    try {
+      const facebookResult = provider === "facebook"
+        ? await startSSOFlow({ strategy: "oauth_facebook", redirectUrl: "vitaqera://sso-callback" })
+        : null;
+      const { createdSessionId, setActive } = facebookResult ?? await startGoogleAuthenticationFlow();
+
+      if (!createdSessionId) {
+        if (facebookResult?.authSessionResult?.type === "success") {
+          throw new Error("Facebook authentication did not create a session.");
+        }
+        return;
+      }
+      if (!setActive) throw new Error(`${provider} authentication did not create a session.`);
+
+      await setActive({ session: createdSessionId });
+      sessionActivated = true;
+      setAwaitingSession(true);
+    } catch (error) {
+      Alert.alert(`${provider === "facebook" ? "Facebook" : "Google"} sign-in failed`, "Please try again.");
+      if (__DEV__) console.warn(`[Auth] ${provider} sign-in failed:`, error);
+    } finally {
+      if (!sessionActivated) {
+        signInBusy.current = false;
+        setLoadingProvider(null);
+      }
+    }
   };
 
   return (
@@ -57,7 +144,7 @@ export function GetStartedScreen() {
         </ScrollView>
         <OnboardingFooter onNext={next} onSelectPage={selectSlide} activeIndex={activeIndex} pageCount={slides.length} label={isLastSlide ? "Get Started" : "Next"} />
       </View>
-      <LoginMethod visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+      <LoginMethod visible={isModalVisible} onClose={() => setIsModalVisible(false)} onContinue={handleContinue} loadingProvider={loadingProvider} />
     </SafeAreaView>
   );
 }

@@ -48,6 +48,7 @@ type AuthScreenProps = {
   onSignUp?: (values: AuthFormValues) => void | Promise<void>;
   onForgotPassword?: (email: string) => void;
   successMessage?: string | null;
+  syncError?: string | null;
   onTermsPress?: () => void;
   onPrivacyPress?: () => void;
 };
@@ -57,6 +58,7 @@ export function AuthScreen({
   onSignUp,
   onForgotPassword,
   successMessage,
+  syncError,
   onTermsPress,
   onPrivacyPress,
 }: AuthScreenProps = {}) {
@@ -353,7 +355,7 @@ export function AuthScreen({
                   )}
                 </View>
 
-                {submitError && <Text accessibilityLiveRegion="polite" style={styles.submitError}>{submitError}</Text>}
+                {(syncError || submitError) && <Text accessibilityLiveRegion="polite" style={styles.submitError}>{syncError || submitError}</Text>}
                 {!isSignUp && successMessage && <Text accessibilityLiveRegion="polite" style={styles.successMessage}>{successMessage}</Text>}
                 <TouchableOpacity
                   activeOpacity={0.75}

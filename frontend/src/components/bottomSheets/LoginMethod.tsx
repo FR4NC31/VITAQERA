@@ -1,6 +1,6 @@
 import Feather from '@expo/vector-icons/Feather';
 import { Image } from 'expo-image';
-import { StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { router } from 'expo-router';
 import { BottomSheet } from '@/components/BottomSheet';
 import { colors, radius, spacing } from '@/theme/theme';
@@ -11,6 +11,7 @@ type LoginMethodProps = {
   visible: boolean;
   onClose: () => void;
   onContinue?: (provider: LoginProvider) => void;
+  loadingProvider?: 'google' | 'facebook' | null;
   onTermsPress?: () => void;
   onPrivacyPress?: () => void;
 };
@@ -62,6 +63,7 @@ export default function LoginMethod({
   visible,
   onClose,
   onContinue,
+  loadingProvider = null,
   onTermsPress,
   onPrivacyPress,
 }: LoginMethodProps) {
@@ -101,12 +103,16 @@ export default function LoginMethod({
                 key={provider.id}
                 activeOpacity={0.7}
                 onPress={() => onContinue?.(provider.id)}
+                disabled={loadingProvider !== null}
                 accessibilityRole="button"
                 accessibilityLabel={provider.label}
+                accessibilityState={{ disabled: loadingProvider !== null, busy: provider.id === loadingProvider }}
                 style={[styles.button, styles.socialButton]}
               >
-                <Image source={provider.icon} style={styles.providerIcon} contentFit="contain" />
-                <Text style={styles.buttonText}>{provider.label}</Text>
+                {provider.id === loadingProvider
+                  ? <ActivityIndicator style={styles.providerIcon} color={colors.textPrimary} />
+                  : <Image source={provider.icon} style={styles.providerIcon} contentFit="contain" />}
+                <Text style={styles.buttonText}>{provider.id === loadingProvider ? `Connecting to ${provider.id === 'google' ? 'Google' : 'Facebook'}…` : provider.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -119,6 +125,7 @@ export default function LoginMethod({
 
           <TouchableOpacity
             activeOpacity={0.7}
+            disabled={loadingProvider !== null}
             onPress={() => {
               onClose();
               if (onContinue) {
