@@ -1,0 +1,54 @@
+import "dotenv/config";
+import type { ExpoConfig } from "expo/config";
+
+const config: ExpoConfig = {
+  name: "VitaQera",
+  slug: "vitaqera",
+  version: "0.1.0",
+  orientation: "portrait",
+  icon: "./assets/images/icon.png",
+  scheme: "vitaqera",
+  userInterfaceStyle: "light",
+
+  android: {
+    package: "com.franc.vitaqera",
+    versionCode: 1,
+    adaptiveIcon: {
+      backgroundColor: "#F8FCFB",
+      foregroundImage: "./assets/images/android-icon-foreground.png",
+      backgroundImage: "./assets/images/android-icon-background.png",
+      monochromeImage: "./assets/images/android-icon-monochrome.png",
+    },
+    predictiveBackGestureEnabled: false,
+  },
+
+  plugins: [
+    "expo-router",
+    [
+      "expo-splash-screen",
+      {
+        backgroundColor: "#F8FCFB",
+        image: "./assets/images/splash-icon.png",
+        imageWidth: 76,
+      },
+    ],
+    "expo-font",
+    "expo-secure-store",
+    "@clerk/expo",
+    "@clerk/expo-google-signin",
+  ],
+
+  experiments: {
+    typedRoutes: true,
+    reactCompiler: true,
+  },
+
+  extra: {
+    EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID:
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID,
+    EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID:
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID,
+  },
+};
+
+export default config;
