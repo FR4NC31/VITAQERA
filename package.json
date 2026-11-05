@@ -1,0 +1,31 @@
+{
+  "name": "vitaqera",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.17.0+sha512.b8d223ebec04b580a89ed206daa71d1bccb6a1ee1d52efa95cc3b0db75271561df8f0d8e2c43add39c5ec08018af7a8a95108e7090f95a29f88727b7a40fd53d",
+  "engines": {
+    "node": ">=22.23.2 <23"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "mobile:start": "pnpm --filter @vitaqera/mobile start",
+    "mobile:android": "pnpm --filter @vitaqera/mobile android",
+    "mobile:lint": "pnpm --filter @vitaqera/mobile lint",
+    "mobile:typecheck": "pnpm --filter @vitaqera/mobile exec tsc --noEmit",
+    "mobile:check": "pnpm --filter @vitaqera/mobile exec expo install --check"
+  },
+  "devDependencies": {
+    "@eslint-react/eslint-plugin": "5.28.8",
+    "@eslint/js": "10.0.1",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "prettier": "3.9.10",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "typescript-eslint": "8.72.1"
+  }
+}
