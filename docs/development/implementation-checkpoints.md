@@ -43,7 +43,9 @@ Each checkpoint should record:
 
 **Roadmap Phase:** Phase 1 — Project Foundation
 
-**Status:** In Review
+**Status:** Completed
+
+**Completion Date:** 2026-11-16
 
 Scope:
 
@@ -61,7 +63,17 @@ Acceptance criteria:
 - Required development scripts work.
 - Project documentation and configuration are reviewed.
 
-Note: Existing files and previously reported successful checks must be verified against the current repository before completion.
+Validation evidence (2026-11-16):
+
+- `pnpm lint` - exit 0.
+- `pnpm format:check` - exit 0.
+- `pnpm api:typecheck` - exit 0.
+- `pnpm mobile:typecheck` - exit 0.
+- `wrangler dev` smoke test: `GET /health` returned 200, `GET /api/auth/get-session` returned 200.
+- Foundation committed: `dc30e6b` (documentation and agent ecosystem), `d754f3f` (API foundation and tooling).
+- Staging verified free of `.dev.vars` and other secrets.
+
+Known deviation: `packages/shared`, `packages/config`, and `packages/validation` are empty placeholders. No shared package code is required until a later phase needs it.
 
 ### CP-002 — Backend Authentication
 
@@ -231,4 +243,17 @@ Each integration requires separate approval and acceptance criteria.
 
 Scope:
 
-- Security audit
+- Security audit.
+- Database and RLS testing.
+- API and mobile integration testing.
+- Regression and performance testing.
+- Accessibility validation.
+- Backup and recovery review.
+- Production deployment and release documentation.
+
+Acceptance criteria:
+
+- Critical issues are resolved.
+- Required tests pass.
+- Security findings are reviewed.
+- Production readiness is approved by the user.
