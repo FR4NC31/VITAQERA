@@ -15,7 +15,10 @@
     "mobile:android": "pnpm --filter @vitaqera/mobile android",
     "mobile:lint": "pnpm --filter @vitaqera/mobile lint",
     "mobile:typecheck": "pnpm --filter @vitaqera/mobile exec tsc --noEmit",
-    "mobile:check": "pnpm --filter @vitaqera/mobile exec expo install --check"
+    "mobile:check": "pnpm --filter @vitaqera/mobile exec expo install --check",
+    "api:dev": "pnpm --filter @vitaqera/api dev",
+    "api:deploy": "pnpm --filter @vitaqera/api deploy",
+    "api:typecheck": "pnpm --filter @vitaqera/api typecheck"
   },
   "devDependencies": {
     "@eslint-react/eslint-plugin": "5.28.8",

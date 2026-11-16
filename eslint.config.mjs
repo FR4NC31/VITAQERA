@@ -15,6 +15,8 @@ export default defineConfig([
       '**/.next/**',
       '**/.turbo/**',
       '**/coverage/**',
+      '**/worker-configuration.d.ts',
+      '**/.wrangler/**',
     ],
   },
   js.configs.recommended,
