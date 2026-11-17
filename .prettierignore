@@ -8,3 +8,5 @@ coverage
 pnpm-lock.yaml
 *.lock
 .wrangler
+worker-configuration.d.ts
+expo-env.d.ts

@@ -3,6 +3,9 @@
   "name": "vitaqera-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-05",
+  "vars": {
+    "BREVO_SENDER_EMAIL": "your-verified-brevo-sender@example.com",
+  },
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],

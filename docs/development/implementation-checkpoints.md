@@ -79,7 +79,9 @@ Known deviation: `packages/shared`, `packages/config`, and `packages/validation`
 
 **Roadmap Phase:** Phase 2 — Backend Authentication
 
-**Status:** Not Started
+**Status:** Completed
+
+**Completion Date:** 2026-11-17
 
 Scope:
 
@@ -98,6 +100,27 @@ Acceptance criteria:
 - Session behavior is secure.
 - Authentication errors are handled consistently.
 - Required automated tests pass.
+
+Validation evidence (2026-11-17):
+
+- Single Better Auth configuration; duplicate dead config removed.
+- Email/password sign-up returned 200 and created a user in Neon.
+- Email OTP delivered through Brevo; OTP stored hashed with 5-minute expiry and deleted after use.
+- `POST /api/auth/email-otp/verify-email` returned `success: true`; `email_verified` flipped to true in the database.
+- `POST /api/auth/sign-in/email` returned `EMAIL_NOT_VERIFIED` before verification and 200 with a session token afterwards.
+- Rate limiting is database-backed (shared across Workers isolates) and keyed on `cf-connecting-ip`; requests returned 429 after the limit.
+- Session cookie issued on sign-in carried `HttpOnly; SameSite=Lax; Path=/; Max-Age=604800`; the cookie value is a random 32-character session token, observed equal to `session.token` (stored verbatim, not hashed).
+- Authentication errors return a consistent JSON shape `{ message, code }`: `EMAIL_NOT_VERIFIED`, `INVALID_OTP`, `MISSING_OR_NULL_ORIGIN`, and 429 rate-limit responses observed.
+- Automated tests: `pnpm --filter @vitaqera/api test` - 2 files, 5 tests passed.
+- `pnpm api:typecheck` - exit 0.
+
+Known limitations (not blockers for CP-002):
+
+- Brevo rewrites the From address to its shared relay for non-authenticated domains. Sending domain authentication (DNS) is deferred to DevOps/production readiness.
+- `BREVO_SENDER_EMAIL` in `wrangler.jsonc` is a placeholder and must be replaced with a verified sender before deployment.
+- Session cookie behavior for the React Native client will be validated in CP-004.
+- Better Auth 1.7.17 has no supported option to hash session tokens: `session.token` stores the cookie token verbatim. `storeOTP: 'hashed'` protects OTP rows only. Revisit if the threat model requires hashed session tokens.
+- The `Secure` cookie attribute cannot be observed on local http; confirm it is present on the https production origin during deployment readiness.
 
 ### CP-003 — Authentication UI/UX
 

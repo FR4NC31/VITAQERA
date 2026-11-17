@@ -1,9 +1,15 @@
 import { betterAuth } from 'better-auth';
+import { emailOTP } from 'better-auth/plugins';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { createDb } from '../db';
 import * as schema from '../db/schema';
+import type { OtpRequest } from '../services/email';
+import { OTP_EXPIRES_IN_SECONDS, sendOtpEmail } from '../services/email';
 
-export function createAuth(env: CloudflareBindings) {
+export function createAuth(
+  env: CloudflareBindings,
+  waitUntil: (promise: Promise<unknown>) => void
+) {
   const db = createDb(env.DATABASE_URL);
 
   return betterAuth({
@@ -18,6 +24,48 @@ export function createAuth(env: CloudflareBindings) {
 
     emailAndPassword: {
       enabled: true,
+      requireEmailVerification: true,
     },
+
+    emailVerification: {
+      sendOnSignUp: true,
+    },
+
+    rateLimit: {
+      enabled: true,
+      window: 60,
+      max: 100,
+      storage: 'database',
+    },
+
+    advanced: {
+      ipAddress: {
+        ipAddressHeaders: ['cf-connecting-ip'],
+      },
+    },
+
+    plugins: [
+      emailOTP({
+        otpLength: 6,
+        expiresIn: OTP_EXPIRES_IN_SECONDS,
+        allowedAttempts: 3,
+        storeOTP: 'hashed',
+        overrideDefaultEmailVerification: true,
+
+        async sendVerificationOTP(data: OtpRequest) {
+          waitUntil(
+            sendOtpEmail(
+              { ...data, expiresInSeconds: OTP_EXPIRES_IN_SECONDS },
+              {
+                apiKey: env.BREVO_API_KEY,
+                senderEmail: env.BREVO_SENDER_EMAIL,
+              }
+            ).catch((error: unknown) => {
+              console.error('OTP email delivery failed:', error);
+            })
+          );
+        },
+      }),
+    ],
   });
 }
