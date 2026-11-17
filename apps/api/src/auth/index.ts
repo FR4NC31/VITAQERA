@@ -3,6 +3,7 @@ import { emailOTP } from 'better-auth/plugins';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { createDb } from '../db';
 import * as schema from '../db/schema';
+import type { OtpRequest } from '../services/email';
 import { OTP_EXPIRES_IN_SECONDS, sendOtpEmail } from '../services/email';
 
 export function createAuth(
@@ -51,7 +52,7 @@ export function createAuth(
         storeOTP: 'hashed',
         overrideDefaultEmailVerification: true,
 
-        async sendVerificationOTP(data) {
+        async sendVerificationOTP(data: OtpRequest) {
           waitUntil(
             sendOtpEmail(
               { ...data, expiresInSeconds: OTP_EXPIRES_IN_SECONDS },

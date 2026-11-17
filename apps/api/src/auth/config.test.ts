@@ -28,7 +28,7 @@ describe('createAuth', () => {
 
   it('registers the email OTP plugin with secure defaults', () => {
     const plugin = (auth.options.plugins ?? []).find(
-      (p) => p.id === 'email-otp'
+      (p: { id?: string }) => p.id === 'email-otp'
     );
 
     expect(plugin).toBeDefined();

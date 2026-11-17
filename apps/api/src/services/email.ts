@@ -2,10 +2,13 @@ export const OTP_EXPIRES_IN_SECONDS = 300;
 
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
-interface OtpEmailParams {
+export type OtpRequest = {
   email: string;
   otp: string;
   type: 'sign-in' | 'email-verification' | 'forget-password' | 'change-email';
+};
+
+interface OtpEmailParams extends OtpRequest {
   expiresInSeconds: number;
 }
 
