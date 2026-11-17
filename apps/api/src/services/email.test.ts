@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { sendOtpEmail } from './email';
+import { OTP_EXPIRES_IN_SECONDS, sendOtpEmail } from './email';
 
 const config = { apiKey: 'test-key', senderEmail: 'sender@example.com' };
 
@@ -15,7 +15,12 @@ describe('sendOtpEmail', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     await sendOtpEmail(
-      { email: 'user@example.com', otp: '123456', type: 'email-verification' },
+      {
+        email: 'user@example.com',
+        otp: '123456',
+        type: 'email-verification',
+        expiresInSeconds: OTP_EXPIRES_IN_SECONDS,
+      },
       config
     );
 
@@ -31,8 +36,9 @@ describe('sendOtpEmail', () => {
       email: 'sender@example.com',
     });
     expect(body.to).toEqual([{ email: 'user@example.com' }]);
-    expect(body.subject).toBe('Your Vitaqera verification code');
+    expect(body.subject).toBe('Your VitaQera verification code');
     expect(body.textContent).toContain('123456');
+    expect(body.textContent).toContain('expires in 5 minutes');
   });
 
   it('throws on Brevo failure without leaking the OTP', async () => {
@@ -46,7 +52,12 @@ describe('sendOtpEmail', () => {
     );
 
     const error = await sendOtpEmail(
-      { email: 'user@example.com', otp: '654321', type: 'sign-in' },
+      {
+        email: 'user@example.com',
+        otp: '654321',
+        type: 'sign-in',
+        expiresInSeconds: OTP_EXPIRES_IN_SECONDS,
+      },
       config
     ).catch((e: unknown) => e);
 

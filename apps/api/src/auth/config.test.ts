@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createAuth } from './index';
+import { OTP_EXPIRES_IN_SECONDS } from '../services/email';
 
 const env = {
   DATABASE_URL: 'postgresql://user:pass@ep-test.neon.tech/db?sslmode=require',
@@ -33,7 +34,8 @@ describe('createAuth', () => {
     expect(plugin).toBeDefined();
     expect(plugin?.options).toMatchObject({
       otpLength: 6,
-      expiresIn: 300,
+      expiresIn: OTP_EXPIRES_IN_SECONDS,
+      allowedAttempts: 3,
       storeOTP: 'hashed',
       overrideDefaultEmailVerification: true,
     });
