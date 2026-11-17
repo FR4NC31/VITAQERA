@@ -12,7 +12,9 @@ app.get('/health', (c) => {
 });
 
 app.all('/api/auth/*', (c) => {
-  const auth = createAuth(c.env);
+  const auth = createAuth(c.env, (promise) =>
+    c.executionCtx.waitUntil(promise)
+  );
 
   return auth.handler(c.req.raw);
 });
