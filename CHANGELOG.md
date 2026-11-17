@@ -12,6 +12,32 @@ Changes that have been implemented and verified but have not yet been assigned t
 
 ### Added
 
+- No verified entries recorded.
+
+### Changed
+
+- No verified entries recorded.
+
+### Fixed
+
+- No verified entries recorded.
+
+### Security
+
+- No verified entries recorded.
+
+### Removed
+
+- No verified entries recorded.
+
+---
+
+## [0.2.0] - 2026-11-17
+
+Development milestone: backend authentication.
+
+### Added
+
 - Monorepo foundation with mobile app, API, shared packages, documentation, and project tooling (CP-001).
 - Hono API on Cloudflare Workers with a health endpoint and Neon PostgreSQL access through Drizzle (CP-001).
 - Email/password authentication with Better Auth, including session management (CP-002).
@@ -41,13 +67,15 @@ Changes that have been implemented and verified but have not yet been assigned t
 
 - Duplicate authentication configuration file superseded by the single Better Auth configuration (CP-002).
 
-Known limitations at this point: Better Auth 1.7.17 does not hash session tokens, Brevo sender domain authentication is pending, and `BREVO_SENDER_EMAIL` in `wrangler.jsonc` is still a placeholder.
+Known limitations: Better Auth 1.7.17 does not hash session tokens, Brevo sender domain authentication is pending, and `BREVO_SENDER_EMAIL` in `wrangler.jsonc` is still a placeholder.
+
+---
 
 ---
 
 ## Release History
 
-No published releases have been recorded in this changelog yet.
+Releases are listed above in reverse chronological order.
 
 Future releases should use the following structure:
 
