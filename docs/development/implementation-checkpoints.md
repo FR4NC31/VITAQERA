@@ -109,6 +109,8 @@ Validation evidence (2026-11-17):
 - `POST /api/auth/email-otp/verify-email` returned `success: true`; `email_verified` flipped to true in the database.
 - `POST /api/auth/sign-in/email` returned `EMAIL_NOT_VERIFIED` before verification and 200 with a session token afterwards.
 - Rate limiting is database-backed (shared across Workers isolates) and keyed on `cf-connecting-ip`; requests returned 429 after the limit.
+- Session cookie issued on sign-in carries `HttpOnly; SameSite=Lax; Path=/; Max-Age=604800`; `Secure` is absent only because local dev runs over http and must be confirmed on the https production origin.
+- Authentication errors return a consistent JSON shape `{ message, code }`: `EMAIL_NOT_VERIFIED`, `INVALID_OTP`, `MISSING_OR_NULL_ORIGIN`, and 429 rate-limit responses observed.
 - Automated tests: `pnpm --filter @vitaqera/api test` - 2 files, 5 tests passed.
 - `pnpm api:typecheck` - exit 0.
 
